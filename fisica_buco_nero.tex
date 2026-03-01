@@ -1,0 +1,1330 @@
+\documentclass[12pt, a4paper, twoside]{article}
+
+% ── Font e codifica ──────────────────────────────────────────────────────────
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+
+% ── Lingua ───────────────────────────────────────────────────────────────────
+\usepackage[italian]{babel}
+
+% ── Matematica ───────────────────────────────────────────────────────────────
+\usepackage{amsmath, amssymb, amsthm, mathtools}
+\usepackage{physics}       % \dd, \pdv, \grad, \curl, ecc.
+\usepackage{tensor}        % notazione tensoriale
+\usepackage{bm}            % grassetto matematico
+
+% ── Layout ───────────────────────────────────────────────────────────────────
+\usepackage[
+  a4paper,
+  top=2.8cm, bottom=2.8cm,
+  left=3.0cm, right=2.5cm,
+  headheight=15pt
+]{geometry}
+\usepackage{fancyhdr}
+\usepackage{emptypage}
+\usepackage{titlesec}
+\usepackage{setspace}
+\onehalfspacing
+
+% ── Grafica e colori ─────────────────────────────────────────────────────────
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{arrows.meta, decorations.pathmorphing, patterns, calc, 3d}
+
+% ── Codice sorgente ──────────────────────────────────────────────────────────
+\usepackage{listings}
+\usepackage{minted}         % syntax highlighting con Pygments
+
+% ── Box e ambienti ───────────────────────────────────────────────────────────
+\usepackage{tcolorbox}
+\tcbuselibrary{theorems, skins, breakable, listings}
+\usepackage{mdframed}
+
+% ── Tabelle ──────────────────────────────────────────────────────────────────
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+
+% ── Hyperlink ────────────────────────────────────────────────────────────────
+\usepackage[
+  colorlinks=true,
+  linkcolor=NavyBlue,
+  citecolor=ForestGreen,
+  urlcolor=RoyalBlue,
+  pdftitle={Simulazione di un Buco Nero},
+  pdfauthor={Trattazione Fisico-Matematica},
+  bookmarks=true
+]{hyperref}
+\usepackage{cleveref}
+
+% ── Bibligrafia ──────────────────────────────────────────────────────────────
+\usepackage[numbers, sort&compress]{natbib}
+
+% ─────────────────────────────────────────────────────────────────────────────
+%  COLORI PERSONALIZZATI
+% ─────────────────────────────────────────────────────────────────────────────
+\definecolor{NavyBlue}{HTML}{1B3A6B}
+\definecolor{RoyalBlue}{HTML}{2E5BCC}
+\definecolor{ForestGreen}{HTML}{1A6B3A}
+\definecolor{CrimsonRed}{HTML}{C0392B}
+\definecolor{DarkGray}{HTML}{333333}
+\definecolor{LightBlue}{HTML}{EAF0FB}
+\definecolor{LightGold}{HTML}{FEF9E7}
+\definecolor{CodeBg}{HTML}{F4F6F9}
+\definecolor{BoxBorder}{HTML}{1B3A6B}
+
+% ─────────────────────────────────────────────────────────────────────────────
+%  AMBIENTI PERSONALIZZATI
+% ─────────────────────────────────────────────────────────────────────────────
+
+% Box per le equazioni fondamentali
+\tcbset{
+  equationbox/.style={
+    enhanced, breakable,
+    colback=LightBlue, colframe=NavyBlue,
+    arc=3pt, boxrule=1.2pt,
+    fonttitle=\bfseries\color{NavyBlue},
+    attach boxed title to top left={yshift=-2mm, xshift=6mm},
+    boxed title style={colback=NavyBlue, colframe=NavyBlue, arc=2pt}
+  },
+  curiositybox/.style={
+    enhanced, breakable,
+    colback=LightGold, colframe=CrimsonRed,
+    arc=3pt, boxrule=1pt,
+    fonttitle=\bfseries\color{CrimsonRed},
+    attach boxed title to top left={yshift=-2mm, xshift=6mm},
+    boxed title style={colback=CrimsonRed, colframe=CrimsonRed, arc=2pt}
+  },
+  codebox/.style={
+    enhanced, breakable,
+    colback=CodeBg, colframe=DarkGray,
+    arc=2pt, boxrule=0.8pt,
+    fonttitle=\bfseries\ttfamily\small\color{DarkGray},
+  }
+}
+
+\newenvironment{physbox}[1]{%
+  \begin{tcolorbox}[equationbox, title={#1}]
+}{%
+  \end{tcolorbox}
+}
+
+\newenvironment{curiosity}[1]{%
+  \begin{tcolorbox}[curiositybox, title={Curiosit\`a: #1}]
+}{%
+  \end{tcolorbox}
+}
+
+% Teorema, definizione, osservazione
+\theoremstyle{definition}
+\newtheorem{defn}{Definizione}[section]
+\newtheorem{prop}{Proposizione}[section]
+\newtheorem{oss}{Osservazione}[section]
+
+% ─────────────────────────────────────────────────────────────────────────────
+%  INTESTAZIONI E PIÈ DI PAGINA
+% ─────────────────────────────────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\small\color{NavyBlue}\textit{Simulazione di un Buco Nero}}
+\fancyhead[RO]{\small\color{NavyBlue}\textit{\leftmark}}
+\fancyfoot[C]{\small\color{DarkGray}\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{NavyBlue}\leaders\hrule height \headrulewidth\hfill}}
+
+% ─────────────────────────────────────────────────────────────────────────────
+%  STILE SEZIONI
+% ─────────────────────────────────────────────────────────────────────────────
+\titleformat{\section}
+  {\color{NavyBlue}\Large\bfseries}
+  {\color{NavyBlue}\thesection.}{0.8em}{}
+  [\color{NavyBlue}\titlerule]
+
+\titleformat{\subsection}
+  {\color{NavyBlue}\large\bfseries}
+  {\color{NavyBlue}\thesubsection.}{0.7em}{}
+
+\titleformat{\subsubsection}
+  {\color{CrimsonRed}\normalsize\bfseries}
+  {\color{CrimsonRed}\thesubsubsection.}{0.6em}{}
+
+% ─────────────────────────────────────────────────────────────────────────────
+%  MACRO UTILI
+% ─────────────────────────────────────────────────────────────────────────────
+\newcommand{\RS}{r_{\!s}}          % raggio di Schwarzschild
+\newcommand{\Rph}{r_{\!\text{ph}}}  % raggio fotosfera
+\newcommand{\Risco}{r_{\!\text{ISCO}}} % ISCO
+\newcommand{\bc}{b_{\!c}}          % parametro d'impatto critico
+\newcommand{\Lobs}{L_{\text{obs}}} % luminosità osservata
+\newcommand{\Lem}{L_{\text{em}}}   % luminosità emessa
+\newcommand{\Tobs}{T_{\text{obs}}} % temperatura osservata
+\newcommand{\Tem}{T_{\text{em}}}   % temperatura emessa
+\newcommand{\munu}{{\mu\nu}}
+\newcommand{\mink}{\eta_{\munu}}
+\newcommand{\Gmunu}{G_{\munu}}
+\newcommand{\Rmunu}{R_{\munu}}
+\newcommand{\Tmunu}{T_{\munu}}
+\newcommand{\gmunu}{g_{\munu}}
+
+% ═════════════════════════════════════════════════════════════════════════════
+%  DOCUMENTO
+% ═════════════════════════════════════════════════════════════════════════════
+\begin{document}
+
+% ─────────────────────────────────────────────────────────────────────────────
+%  FRONTESPIZIO
+% ─────────────────────────────────────────────────────────────────────────────
+\begin{titlepage}
+  \centering
+  \vspace*{2cm}
+
+  {\color{NavyBlue}\rule{\linewidth}{1.5pt}}\\[0.5em]
+  {\color{NavyBlue}\rule{\linewidth}{0.4pt}}\\[2em]
+
+  {\Huge\bfseries\color{NavyBlue} Simulazione di un Buco Nero}\\[0.8em]
+  {\large\itshape\color{DarkGray}
+    Dalla Relativit\`a Generale al Ray Tracing su GPU}\\[2em]
+
+  {\color{NavyBlue}\rule{\linewidth}{0.4pt}}\\[0.5em]
+  {\color{NavyBlue}\rule{\linewidth}{1.5pt}}\\[3em]
+
+  \begin{minipage}{0.85\textwidth}
+    \centering
+    {\normalsize\color{DarkGray}
+      Trattazione fisico-matematica completa della metrica di Schwarzschild,
+      delle geodetiche nulle, del lensing gravitazionale, del disco di
+      accrescimento con profilo di Novikov--Thorne, del redshift gravitazionale
+      e dell'effetto Doppler relativistico. Implementazione dello shader GLSL
+      con integrazione numerica Runge--Kutta del quarto ordine.
+    }
+  \end{minipage}
+
+  \vfill
+
+  \begin{tabular}{ll}
+    \toprule
+    \textbf{Argomento}   & Relativit\`a Generale, Astrofisica, Computer Graphics \\
+    \textbf{Livello}     & Laurea Magistrale in Fisica \\
+    \textbf{Linguaggio}  & GLSL 3.30 (OpenGL Shading Language) \\
+    \textbf{Unità}       & Geometrizzate: $G = c = M = 1$ \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{2em}
+  {\small\color{DarkGray}\today}
+\end{titlepage}
+
+% ─────────────────────────────────────────────────────────────────────────────
+%  INDICE
+% ─────────────────────────────────────────────────────────────────────────────
+\tableofcontents
+\newpage
+
+% ═════════════════════════════════════════════════════════════════════════════
+%  INTRODUZIONE
+% ═════════════════════════════════════════════════════════════════════════════
+\section*{Introduzione}
+\addcontentsline{toc}{section}{Introduzione}
+
+Un buco nero è forse l'oggetto più estremo che la fisica contempli: una regione
+dello spaziotempo dalla cui influenza gravitazionale nulla può sfuggire, nemmeno
+la luce. Eppure i buchi neri non sono completamente invisibili: il materiale che
+cade verso di essi forma un \emph{disco di accrescimento} incandescente, e la
+loro gravità deforma la geometria della luce che ci arriva, producendo immagini
+straordinarie visibili anche da osservatori lontani.
+
+Questo documento sviluppa la fisica e la matematica necessarie a \emph{simulare}
+questa visione, con un livello di accuratezza sufficiente a riprodurre
+qualitativamente le immagini ottenute da telescopi spaziali e da interferometri
+radio come l'\textit{Event Horizon Telescope} (EHT).
+
+Il percorso è il seguente:
+\begin{enumerate}
+  \item Le equazioni di campo di Einstein e la loro soluzione per un buco nero
+        sferico (metrica di Schwarzschild).
+  \item La soluzione per un buco nero in rotazione (metrica di Kerr) e
+        le sue proprietà peculiari.
+  \item Le geodetiche nulle: come si muove la luce in uno spaziotempo curvo.
+  \item Il disco di accrescimento: struttura, temperatura, luminosità.
+  \item Gli effetti osservativi: redshift gravitazionale, effetto Doppler
+        relativistico, beaming.
+  \item L'algoritmo di ray tracing relativistico e la sua implementazione
+        in GLSL con Runge--Kutta al quarto ordine.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Unità.} In tutto il documento utilizziamo \emph{unità
+geometrizzate}: $G = c = 1$. In queste unità la massa $M$ ha le dimensioni
+di una lunghezza (in unità SI, $G M / c^2$ è la metà del raggio di
+Schwarzschild). Il raggio di Schwarzschild diventa semplicemente $\RS = 2M$.
+
+\newpage
+
+% ═════════════════════════════════════════════════════════════════════════════
+%  PARTE I — FONDAMENTI FISICI
+% ═════════════════════════════════════════════════════════════════════════════
+
+\section{La Relativit\`a Generale e la Curvatura dello Spaziotempo}
+
+\subsection{L'idea fondamentale}
+
+La meccanica newtoniana descrive la gravità come una \emph{forza} che agisce
+istantaneamente a distanza: ogni massa attrae ogni altra in proporzione al
+prodotto delle masse e in ragione inversa del quadrato della distanza. Questa
+descrizione funziona splendidamente nel regime delle velocità basse e dei campi
+deboli, ma si incrina quando le velocità diventano relativistiche o i campi
+gravitazionali estremamente intensi.
+
+Einstein propose un'idea radicalmente diversa. La gravità non è una forza:
+è una manifestazione della \emph{curvatura dello spaziotempo}. La presenza di
+massa-energia deforma la struttura geometrica dello spazio e del tempo, e i
+corpi \enquote{cadono} semplicemente seguendo le traiettorie più dritte possibili
+(le \emph{geodetiche}) in questo spazio curvo. Come disse John Wheeler:
+
+\begin{quote}
+  \itshape
+  ``La materia dice allo spaziotempo come curvarsi,
+    lo spaziotempo dice alla materia come muoversi.''
+\end{quote}
+
+\subsection{Le equazioni di campo di Einstein}
+
+Le equazioni di campo di Einstein, pubblicate nel novembre 1915, sono il cuore
+della Relatività Generale. Sono dieci equazioni tensoriali (in realtà sei
+indipendenti, per simmetrie) che legano la geometria dello spaziotempo alla
+distribuzione di massa-energia:
+
+\begin{physbox}{Equazioni di Campo di Einstein (1915)}
+\begin{equation}
+  \Gmunu + \Lambda \gmunu = \frac{8\pi G}{c^4}\, \Tmunu
+  \label{eq:einstein}
+\end{equation}
+dove:
+$\quad \Gmunu = \Rmunu - \tfrac{1}{2} R\, \gmunu$ \quad (tensore di Einstein)
+\end{physbox}
+
+\medskip
+Ogni simbolo merita una spiegazione:
+
+\begin{description}
+  \item[$\gmunu$] Il \textbf{tensore metrico}: la quantità fondamentale che
+    descrive la geometria dello spaziotempo. In spazio piatto (Minkowski) è
+    $\mink = \text{diag}(-1,+1,+1,+1)$. In uno spaziotempo curvo $\gmunu$
+    dipende dalle coordinate e dalla posizione. Definisce l'elemento di linea:
+    \[
+      ds^2 = \gmunu\, dx^\mu dx^\nu
+    \]
+    che generalizza il teorema di Pitagora a quattro dimensioni curve.
+
+  \item[$\Rmunu$] Il \textbf{tensore di Ricci}: contrazione del tensore di
+    Riemann $R^\rho_{\ \sigma\mu\nu}$, cioè $\Rmunu = R^\rho_{\ \mu\rho\nu}$.
+    Il tensore di Riemann misura quanto un vettore ruota quando viene
+    \emph{trasportato parallelamente} lungo una curva chiusa — una misura
+    intrinseca della curvatura che non dipende dal sistema di coordinate.
+
+  \item[$R$] La \textbf{scalare di Ricci}: $R = g^{\munu}\Rmunu$, la traccia
+    del tensore di Ricci. Rappresenta la curvatura scalare media dello
+    spaziotempo.
+
+  \item[$\Lambda$] La \textbf{costante cosmologica}: introdotta da Einstein
+    nel 1917 per ottenere un universo statico, poi abbandonata dopo la scoperta
+    dell'espansione di Hubble (1929), e infine riscoperta come energia del vuoto
+    responsabile dell'espansione accelerata dell'universo. Il suo valore
+    misurato è $\Lambda \approx 1.1 \times 10^{-52}\ \text{m}^{-2}$.
+
+  \item[$\Tmunu$] Il \textbf{tensore energia-impulso}: descrive la distribuzione
+    di energia, pressione, densità e flusso di momento della materia. Per il
+    vuoto $\Tmunu = 0$, e le equazioni di campo diventano $\Gmunu = 0$ (o
+    equivalentemente $\Rmunu = 0$, dette \emph{equazioni di vuoto}).
+
+  \item[$G$, $c$] La costante di gravitazione universale e la velocità della
+    luce. Il fattore $8\pi G/c^4 \approx 2 \times 10^{-43}\ \text{N}^{-1}$
+    è estremamente piccolo: la geometria dello spaziotempo risponde debolmente
+    alla presenza di energia, il che spiega perché gli effetti relativistici
+    siano trascurabili nella vita quotidiana.
+\end{description}
+
+\begin{curiosity}{Perché $8\pi$?}
+  Il fattore $8\pi G/c^4$ non è arbitrario: è fissato richiedendo che nel
+  limite di campo gravitazionale debole e velocità non relativistiche, le
+  equazioni di Einstein si riducano alla legge di Poisson newtoniana
+  $\nabla^2\Phi = 4\pi G\rho$. Questo \emph{limite newtoniano} è il punto di
+  contatto tra le due teorie e vincola univocamente la costante.
+\end{curiosity}
+
+\subsection{I simboli di Christoffel e le geodetiche}
+
+Dato un tensore metrico $\gmunu$, i \textbf{simboli di Christoffel} (o
+\emph{connessione di Levi-Civita}) sono:
+
+\begin{equation}
+  \Gamma^\lambda_{\ \mu\nu}
+  = \frac{1}{2}\, g^{\lambda\sigma}
+    \left(\partial_\mu g_{\nu\sigma}
+        + \partial_\nu g_{\mu\sigma}
+        - \partial_\sigma g_{\mu\nu}\right)
+  \label{eq:christoffel}
+\end{equation}
+
+Descrivono come variano le basi del sistema di coordinate nello spazio curvo.
+Non sono un tensore (si trasformano in modo diverso) ma compaiono nell'equazione
+delle \textbf{geodetiche} — le generalizzazioni relativistiche delle linee rette:
+
+\begin{equation}
+  \frac{d^2 x^\lambda}{d\tau^2}
+  + \Gamma^\lambda_{\ \mu\nu}\frac{dx^\mu}{d\tau}\frac{dx^\nu}{d\tau} = 0
+  \label{eq:geodetica}
+\end{equation}
+
+dove $\tau$ è il \emph{tempo proprio} dell'osservatore (il tempo misurato dal
+suo orologio). Per la luce, che ha $ds^2 = 0$, si usa un parametro affine
+$\lambda$ al posto di $\tau$. Queste equazioni — le leggi del moto in
+Relatività Generale — sostituiscono $F = ma$ newtoniana.
+
+\newpage
+
+% ═════════════════════════════════════════════════════════════════════════════
+\section{La Metrica di Schwarzschild}
+% ═════════════════════════════════════════════════════════════════════════════
+
+\subsection{La prima soluzione esatta}
+
+Karl Schwarzschild trovò la prima soluzione esatta delle equazioni di Einstein
+nel dicembre 1915, poche settimane dopo la pubblicazione delle equazioni stesse,
+mentre si trovava al fronte orientale durante la Prima Guerra Mondiale. Morì
+pochi mesi dopo per una malattia contratta in trincea.
+
+La soluzione descrive lo spaziotempo \emph{esterno} a un oggetto sferico,
+non rotante, nel vuoto ($\Tmunu = 0$). Il \textbf{teorema di Birkhoff} (1923)
+dimostra che questa è la \emph{unica} soluzione a simmetria sferica nel vuoto:
+qualunque distribuzione sferica di materia genera all'esterno esattamente la
+metrica di Schwarzschild.
+
+\subsection{L'elemento di linea}
+
+\begin{physbox}{Metrica di Schwarzschild}
+\begin{equation}
+  ds^2 = -\!\left(1 - \frac{\RS}{r}\right)c^2\,dt^2
+         + \left(1 - \frac{\RS}{r}\right)^{\!\!-1} dr^2
+         + r^2\,d\theta^2 + r^2\sin^2\theta\, d\varphi^2
+  \label{eq:schwarzschild}
+\end{equation}
+con il \textbf{raggio di Schwarzschild}:
+\[
+  \RS = \frac{2GM}{c^2}
+\]
+\end{physbox}
+
+\medskip
+In unità geometrizzate ($G = c = M = 1$), $\RS = 2$.
+
+\subsection{Il significato fisico dei coefficienti}
+
+La metrica \eqref{eq:schwarzschild} ha una struttura molto ricca:
+
+\begin{description}
+  \item[Coefficiente temporale $g_{tt} = -(1-\RS/r)$.]
+    A grandi distanze ($r \to \infty$) vale $-1$: lo spazio è piatto e il
+    tempo scorre normalmente. All'avvicinarsi a $r = \RS$, il coefficiente
+    tende a zero: il \emph{tempo si ferma} per un osservatore lontano.
+    Per $r < \RS$, $g_{tt}$ diventa positivo — tempo e spazio \emph{scambiano
+    ruolo}: la coordinata $r$ diventa temporale e la caduta verso $r=0$
+    è inevitabile come il passare del tempo.
+
+  \item[Coefficiente radiale $g_{rr} = (1-\RS/r)^{-1}$.]
+    Diverge per $r \to \RS$: le distanze radiali vengono dilatate
+    indefinitamente. Tuttavia questa è solo una singolarità della coordinata,
+    non fisica.
+
+  \item[Parte angolare $r^2\,d\Omega^2$.]
+    Identica a quella dello spazio piatto: la geometria delle sfere concentriche
+    non viene alterata dalla curvatura radiale. Il raggio $r$ è in realtà la
+    coordinata areale: una sfera a coordinata $r$ ha area $4\pi r^2$.
+\end{description}
+
+\subsection{Le due singolarità}
+
+\subsubsection{$r = 0$: singolarità fisica}
+
+All'origine, la curvatura diverge. In particolare l'invariante di Kretschner:
+\begin{equation}
+  K = R_{\mu\nu\rho\sigma}R^{\mu\nu\rho\sigma}
+  = \frac{48 G^2 M^2}{c^4 r^6} \xrightarrow{r\to 0} \infty
+\end{equation}
+è un invariante scalare (non dipende dal sistema di coordinate), quindi questa
+divergenza è reale. La Relatività Generale smette di essere valida qui: si
+suppone che la meccanica quantistica — che la RG ignora completamente —
+regolarizzi questa singolarità. Una teoria della \emph{gravità quantistica},
+ancora mancante, è necessaria per descrivere $r = 0$.
+
+\subsubsection{$r = \RS$: singolarità della coordinata (orizzonte degli eventi)}
+
+Questa singolarità è un artificio del sistema di riferimento. Passando alle
+\textbf{coordinate di Kruskal-Szekeres}:
+\begin{align}
+  T &= \left(\frac{r}{\RS} - 1\right)^{1/2} e^{r/(2\RS)} \sinh\!\left(\frac{ct}{2\RS}\right)\\
+  X &= \left(\frac{r}{\RS} - 1\right)^{1/2} e^{r/(2\RS)} \cosh\!\left(\frac{ct}{2\RS}\right)
+\end{align}
+la metrica diventa regolare all'orizzonte. Fisicamente, $r = \RS$ è la
+\textbf{superficie causale}: la frontiera da cui nessun segnale può sfuggire.
+
+\subsubsection{Valori numerici del raggio di Schwarzschild}
+
+\begin{table}[h!]
+  \centering
+  \begin{tabular}{llll}
+    \toprule
+    \textbf{Oggetto} & \textbf{Massa} & $\RS$ & \textbf{Densità media al collasso}\\
+    \midrule
+    Terra    & $5.97\times10^{24}$ kg & $8.9$ mm & $2\times10^{27}$ kg/m$^3$ \\
+    Sole     & $1.99\times10^{30}$ kg & $2.95$ km & $1.8\times10^{19}$ kg/m$^3$ \\
+    M87*     & $6.5\times10^9\, M_\odot$ & $\approx 1.9\times10^{10}$ km & $\approx 2$ kg/m$^3$ \\
+    Sgr A*   & $4.15\times10^6\, M_\odot$ & $\approx 1.2\times10^7$ km & $\approx 5\times10^3$ kg/m$^3$ \\
+    \bottomrule
+  \end{tabular}
+  \caption{Raggi di Schwarzschild per vari oggetti. Si noti che per i buchi
+           neri supermassicci la densità media è straordinariamente bassa.}
+\end{table}
+
+\begin{curiosity}{M87* ha densità inferiore all'aria!}
+  Il buco nero M87*, con $\RS \approx 1.9 \times 10^{10}$ km, ha una densità
+  media al collasso (calcolata come massa su volume della sfera di raggio $\RS$)
+  di circa $2$ kg/m$^3$ — inferiore alla densità dell'aria a livello del mare
+  ($\approx 1.2$ kg/m$^3$). Questo sembra paradossale ma è corretto: per
+  masse sufficientemente grandi, il collasso avviene a densità sempre più
+  basse, perché $\RS \propto M$ mentre il volume scala come $M^3$.
+  La sensazione di caduta vertiginosa all'orizzonte dipende dall'accelerazione
+  di marea $\sim GM/\RS^3 \propto 1/M^2$: per M87* è praticamente zero
+  all'orizzonte. Un astronauta non sentirebbe nulla attraversandolo.
+\end{curiosity}
+
+\newpage
+
+% ═════════════════════════════════════════════════════════════════════════════
+\section{La Metrica di Kerr e la Rotazione}
+% ═════════════════════════════════════════════════════════════════════════════
+
+\subsection{La soluzione di Kerr}
+
+Nel 1963, quarantott'anni dopo Schwarzschild, Roy Kerr trovò la soluzione per
+un buco nero \emph{in rotazione} con momento angolare $J$. Si tratta della
+soluzione più realistica per i buchi neri astrofisici, poiché tutti i corpi
+celesti hanno momento angolare non nullo per conservazione angolare durante
+il collasso.
+
+Si introduce il \textbf{parametro di spin} $a = J/(Mc)$, con le dimensioni
+di una lunghezza, e il parametro adimensionale $a^* = ac/(GM) \in [0, 1]$.
+Due funzioni ausiliarie semplificano la scrittura:
+\begin{align}
+  \Sigma &= r^2 + a^2\cos^2\theta \\
+  \Delta &= r^2 - \RS\, r + a^2
+\end{align}
+
+\begin{physbox}{Metrica di Kerr (coordinate di Boyer-Lindquist)}
+\begin{equation}
+  ds^2 = -\frac{\Delta}{\Sigma}\!\left(dt - a\sin^2\!\theta\, d\varphi\right)^2
+        + \frac{\Sigma}{\Delta}\,dr^2
+        + \Sigma\, d\theta^2
+        + \frac{\sin^2\!\theta}{\Sigma}\!\left(a\,dt - (r^2+a^2)d\varphi\right)^2
+  \label{eq:kerr}
+\end{equation}
+\end{physbox}
+
+\subsection{I due orizzonti}
+
+Le radici di $\Delta = 0$ danno i due orizzonti:
+\begin{equation}
+  r_\pm = \frac{\RS}{2} \pm \sqrt{\left(\frac{\RS}{2}\right)^2 - a^2}
+\end{equation}
+Per $a = 0$ si recupera $r_+ = \RS$ (Schwarzschild). Per $a = GM/c$
+(\textbf{buco nero estremale}), $r_+ = r_- = M$: i due orizzonti coincidono
+e la struttura causale del buco nero cambia radicalmente.
+
+\subsection{L'ergosfera e il frame dragging}
+
+Per la metrica di Kerr, la superficie $g_{tt} = 0$ non coincide con l'orizzonte
+ma si trova a:
+\begin{equation}
+  r_{\text{ergo}}(\theta) = \frac{\RS}{2} + \sqrt{\left(\frac{\RS}{2}\right)^2 - a^2\cos^2\theta}
+\end{equation}
+La regione $r_+ < r < r_{\text{ergo}}$ è l'\textbf{ergosfera}. Qui, il
+coefficiente $g_{tt}$ cambia segno: qualunque osservatore è costretto a
+co-ruotare con il buco nero (\emph{frame dragging}), anche se impiega propulsori
+per restare fermo. Non può esistere nessun osservatore a riposo rispetto alle
+stelle lontane dentro l'ergosfera.
+
+\begin{curiosity}{Il Processo di Penrose}
+  Roger Penrose dimostrò nel 1969 che è possibile estrarre energia rotazionale
+  da un buco nero di Kerr tramite un processo che avviene nell'ergosfera.
+  Se una particella si divide in due dentro l'ergosfera, una delle due può
+  avere energia \emph{negativa} (permessa perché $g_{tt} > 0$) e cadere
+  nel buco nero, mentre l'altra esce con energia superiore a quella della
+  particella originale. Il buco nero rallenta. L'energia massima estraibile
+  è $1 - 1/\sqrt{2} \approx 29\%$ della massa del buco nero estremale.
+  I jet relativistici osservati in molti quasar potrebbero sfruttare un
+  meccanismo analogo (processo di Blandford-Znajek).
+\end{curiosity}
+
+\newpage
+
+% ═════════════════════════════════════════════════════════════════════════════
+\section{Le Geodetiche Nulle e il Moto della Luce}
+% ═════════════════════════════════════════════════════════════════════════════
+
+\subsection{Le costanti del moto}
+
+La metrica di Schwarzschild è stazionaria (non dipende da $t$) e a simmetria
+azimutale (non dipende da $\varphi$). Per il teorema di Noether, esistono due
+costanti del moto per ogni fotone:
+
+\begin{equation}
+  E = -g_{tt}\frac{dt}{d\lambda} = \left(1 - \frac{\RS}{r}\right)\frac{dt}{d\lambda}
+  \qquad \text{(energia)}
+\end{equation}
+\begin{equation}
+  L = g_{\varphi\varphi}\frac{d\varphi}{d\lambda} = r^2\frac{d\varphi}{d\lambda}
+  \qquad \text{(momento angolare)}
+\end{equation}
+
+Il \textbf{parametro d'impatto} $b = L/E$ ha un significato geometrico chiaro:
+è la distanza perpendicolare tra il raggio e il centro del buco nero misurata
+lontano da esso. Un raggio radiale ha $b = 0$, un raggio tangente lontano ha
+$b \to \infty$.
+
+\subsection{Il potenziale efficace per la luce}
+
+Il vincolo $ds^2 = 0$ per la geodetica nulla nel piano equatoriale
+($\theta = \pi/2$) dà:
+
+\begin{equation}
+  \left(\frac{dr}{d\lambda}\right)^2 = E^2 - \frac{L^2}{r^2}\left(1 - \frac{\RS}{r}\right)
+  \equiv E^2 - V_{\text{eff}}(r)
+\end{equation}
+
+Il \textbf{potenziale efficace} per la luce è:
+\begin{equation}
+  V_{\text{eff}}(r) = \frac{L^2}{r^2}\left(1 - \frac{\RS}{r}\right)
+  = \frac{L^2}{r^2} - \frac{L^2 \RS}{r^3}
+  \label{eq:veff}
+\end{equation}
+
+\begin{figure}[h!]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+      width=10cm, height=6cm,
+      xlabel={$r/\RS$}, ylabel={$V_{\text{eff}}/L^2$},
+      xmin=1, xmax=10, ymin=-0.01, ymax=0.055,
+      grid=major, grid style={dashed, gray!30},
+      axis lines=left,
+      tick label style={font=\small},
+      label style={font=\small\color{NavyBlue}},
+      every axis plot/.append style={thick}
+    ]
+      \addplot[NavyBlue, domain=1.1:10, samples=200]
+        { 1/x^2 * (1 - 2/x) };
+      \addplot[CrimsonRed, dashed, domain=1.1:10]
+        { 1/(27) };
+      \addplot[ForestGreen, dotted, domain=1.5:1.5, ymin=0, ymax=0.055]
+        coordinates {(1.5, 0) (1.5, 1/(27))};
+      \node[font=\small, color=CrimsonRed] at (axis cs:8, 0.040) {$V_{\max} = \frac{1}{27}$};
+      \node[font=\small, color=ForestGreen] at (axis cs:1.8, 0.005) {$r=1.5\,\RS$};
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Potenziale efficace per la luce nella metrica di Schwarzschild
+           (in unità $L^2 = 1$). Il massimo a $r = 1.5\,\RS$ corrisponde
+           alla fotosfera. I raggi con $b^2 = L^2/E^2 < 27M^2$ cadono
+           nel buco nero; quelli con $b^2 > 27M^2$ sfuggono.}
+\end{figure}
+
+\subsection{La fotosfera e il parametro d'impatto critico}
+
+Il massimo di $V_{\text{eff}}$ si trova ponendo $dV_{\text{eff}}/dr = 0$:
+
+\begin{equation}
+  \frac{dV_{\text{eff}}}{dr} = -\frac{2L^2}{r^3} + \frac{3L^2\RS}{r^4} = 0
+  \quad\Longrightarrow\quad
+  r_{\text{ph}} = \frac{3\RS}{2} = \frac{3GM}{c^2}
+\end{equation}
+
+Questo è il raggio della \textbf{fotosfera} (o \emph{photon sphere}): l'orbita
+circolare instabile dei fotoni. Un fotone con esattamente il parametro
+d'impatto critico:
+
+\begin{physbox}{Parametro d'impatto critico}
+\begin{equation}
+  \bc = \sqrt{27}\, M = \frac{3\sqrt{3}}{2}\, \RS \approx 2.598\,\RS
+  \label{eq:bcrit}
+\end{equation}
+\end{physbox}
+
+orbita indefinitamente sulla fotosfera. Questo valore determina la dimensione
+apparente dell'\textbf{ombra del buco nero}: tutti i raggi con $b < \bc$ cadono
+nell'orizzonte; quelli con $b > \bc$ sfuggono. Per un osservatore lontano,
+l'ombra ha raggio angolare:
+\begin{equation}
+  \alpha_{\text{shadow}} = \frac{\bc}{D} = \frac{3\sqrt{3}\,GM}{c^2 D}
+\end{equation}
+dove $D$ è la distanza. Per M87* ($D = 16.8$ Mpc, $M = 6.5 \times 10^9 M_\odot$):
+$\alpha_{\text{shadow}} \approx 20\ \mu\text{as}$ — confermato entro il 17\%
+dalla fotografia EHT del 2019.
+
+\begin{curiosity}{Perché l'ombra è più grande dell'orizzonte?}
+  L'ombra del buco nero ha raggio apparente $\bc \approx 2.6\,\RS$, molto
+  maggiore dell'orizzonte degli eventi a $\RS$. Il motivo è il lensing
+  gravitazionale: i raggi che passano \emph{vicino} all'orizzonte ma non
+  lo attraversano vengono deflessi così tanto che, visti dall'osservatore,
+  sembrano provenire dall'interno dell'ombra. L'ombra è dunque la \emph{proiezione
+  della fotosfera}, non dell'orizzonte.
+\end{curiosity}
+
+\subsection{L'equazione di Binet relativistica}
+
+Sostituendo $u = 1/r$ (variabile di Binet), la traiettoria dei fotoni diventa:
+
+\begin{physbox}{Equazione di Binet per la luce (RG)}
+\begin{equation}
+  \frac{d^2 u}{d\varphi^2} = -u + \frac{3\RS}{2}\, u^2
+  \label{eq:binet}
+\end{equation}
+\end{physbox}
+
+Il termine $-u$ è la traiettoria rettilinea in spazio piatto (con $b = 1/u_0$
+costante). Il termine $\frac{3\RS}{2}\, u^2$ è la \textbf{correzione relativistica}:
+è questo unico termine a generare tutto il lensing gravitazionale, la fotosfera,
+l'ombra e il photon ring.
+
+Riscriviamo come sistema del primo ordine per l'integrazione numerica:
+\begin{align}
+  \frac{du}{d\varphi} &= w \\
+  \frac{dw}{d\varphi} &= -u + \frac{3\RS}{2}\, u^2
+  \label{eq:ode_system}
+\end{align}
+Questo è il sistema che integriamo con Runge-Kutta nel codice GLSL.
+
+\newpage
+
+% ═════════════════════════════════════════════════════════════════════════════
+\section{Il Disco di Accrescimento}
+% ═════════════════════════════════════════════════════════════════════════════
+
+\subsection{Perché un disco?}
+
+Il materiale che cade verso un buco nero porta con sé momento angolare.
+Per conservazione del momento angolare, non può cadere direttamente verso
+il centro ma forma una struttura con simmetria azimutale: il \textbf{disco
+di accrescimento}. Il gas nel disco perde lentamente energia e momento angolare
+per attrito viscoso (in realtà instabilità magnetoidrodinamiche — l'instabilità
+di Magneto-Rotazionale, o MRI), spiralando lentamente verso l'interno.
+
+\subsection{L'orbita circolare stabile più interna (ISCO)}
+
+Non tutte le orbite circolari sono stabili. Nella metrica di Schwarzschild,
+l'orbita circolare più interna stabile — detta \textbf{ISCO} dall'inglese
+\textit{Innermost Stable Circular Orbit} — si trova a:
+
+\begin{equation}
+  \Risco = 3\,\RS = \frac{6GM}{c^2}
+  \label{eq:isco}
+\end{equation}
+
+Il materiale dentro l'ISCO perde stabilità orbitale e cade rapidamente verso
+l'orizzonte senza dissipare ulteriore energia — il disco finisce a $\Risco$.
+Per la metrica di Kerr, l'ISCO dipende dallo spin:
+\begin{itemize}
+  \item Spin zero (Schwarzschild): $\Risco = 6M$
+  \item Spin massimo pro-grado: $\Risco = M$ (il bordo del buco nero stesso)
+  \item Spin massimo retrogrado: $\Risco = 9M$
+\end{itemize}
+Questo significa che i buchi neri in rapida rotazione accrescono in modo
+molto più efficiente: il materiale può spiralare molto più vicino e rilasciare
+molta più energia gravitazionale prima di cadere.
+
+\subsection{Il profilo di temperatura: modello di Novikov-Thorne}
+
+Il modello di Novikov-Thorne (1973) descrive la struttura termica di un disco
+geometricamente sottile e otticamente spesso. Il flusso di energia radiata
+per unità di superficie del disco è:
+
+\begin{equation}
+  Q(r) = \frac{3GM\dot{M}}{8\pi r^3}
+         \left(1 - \sqrt{\frac{\Risco}{r}}\right)
+         \cdot f(r)
+\end{equation}
+
+dove $\dot{M}$ è il tasso di accrescimento (massa per unità di tempo) e $f(r)$
+è un fattore di correzione relativistico. Nello shader usiamo l'approssimazione
+di corpo nero locale $Q = \sigma_{\text{SB}} T^4$, ottenendo il profilo di
+temperatura approssimato:
+
+\begin{physbox}{Profilo di temperatura del disco}
+\begin{equation}
+  T(r) \propto \left(\frac{r}{\Risco}\right)^{-3/4}
+               \left(1 - \sqrt{\frac{\Risco}{r}}\right)^{1/4}
+  \label{eq:temperature_profile}
+\end{equation}
+\end{physbox}
+
+\begin{description}
+  \item[Il fattore $r^{-3/4}$] proviene dal flusso kepleriano: zone più interne
+    sono più calde perché l'energia potenziale gravitazionale rilasciata per
+    unità di area aumenta verso l'interno.
+  \item[Il fattore $(1 - \sqrt{\Risco/r})^{1/4}$] impone $T \to 0$ all'ISCO:
+    il bordo interno del disco è freddo perché il materiale scivola dentro
+    senza dissipare ulteriore calore.
+\end{description}
+
+Le temperature raggiunte nel disco variano da:
+\begin{itemize}
+  \item $\sim 10^4$ K al bordo esterno (emissione nell'infrarosso e nel visibile)
+  \item $\sim 10^6$–$10^7$ K vicino all'ISCO per buchi neri stellari (emissione in raggi X)
+  \item $\sim 10^5$ K per i buchi neri supermassicci (UV e raggi X molli)
+\end{itemize}
+
+\subsection{L'efficienza di accrescimento}
+
+L'energia rilasciata per unità di massa in caduta libera newtoniana sarebbe
+$GM/(2r)$ — senza limite teorico. Con il profilo di Novikov-Thorne, l'efficienza
+di conversione massa-energia è:
+
+\begin{equation}
+  \eta_{\text{Schwarzschild}} = 1 - \sqrt{1 - \frac{2}{3}\cdot\frac{\RS}{\Risco}}
+  = 1 - \sqrt{\frac{8}{9}} \approx 5.7\%
+\end{equation}
+
+Per confronto, la fusione nucleare (idrogeno in elio) raggiunge solo $\sim 0.7\%$.
+I buchi neri in accrescimento sono i motori più efficienti dell'universo.
+Per lo spin massimo di Kerr, $\eta$ sale fino a $\approx 42\%$.
+
+\newpage
+
+% ═════════════════════════════════════════════════════════════════════════════
+\section{Effetti Osservativi Relativistici}
+% ═════════════════════════════════════════════════════════════════════════════
+
+\subsection{Il redshift gravitazionale}
+
+Un fotone emesso a raggio $r$ con frequenza $\nu_e$ e osservato lontano dal
+campo gravitazionale arriva con frequenza:
+
+\begin{physbox}{Redshift Gravitazionale di Schwarzschild}
+\begin{equation}
+  \nu_\infty = \nu_e \sqrt{1 - \frac{\RS}{r}}
+  \label{eq:redshift}
+\end{equation}
+\end{physbox}
+
+Per la legge di Wien ($\nu_{\max} \propto T$), la temperatura apparente
+del disco viene ridotta dello stesso fattore:
+\begin{equation}
+  \Tobs(r) = \Tem(r) \cdot \sqrt{1 - \frac{\RS}{r}}
+\end{equation}
+
+All'orizzonte ($r \to \RS$): $\nu_\infty \to 0$. Qualunque cosa accada
+all'orizzonte è invisibile per noi: i fotoni perdono tutta la loro energia
+in frequenza infinitamente più bassa. Questo è il motivo per cui l'ombra
+del buco nero è nera.
+
+\begin{curiosity}{Il redshift gravitazionale misurato sulla Terra}
+  Il redshift gravitazionale è misurabile anche sulla Terra. Un orologio
+  al piano terra di un grattacielo scorre più lentamente di uno al piano
+  superiore. Nel 2010, con orologi ottici al literbio, è stato misurato
+  un $\Delta\nu/\nu \approx 4 \times 10^{-17}$ su una differenza di quota
+  di soli 33 cm — la previsione di Einstein confermata con precisione
+  al livello di $10^{-4}$.
+\end{curiosity}
+
+\subsection{L'effetto Doppler relativistico}
+
+Il materiale nel disco ruota a velocità relativistiche. La velocità orbitale
+kepleriana nella metrica di Schwarzschild per un'orbita circolare a raggio $r$ è:
+
+\begin{equation}
+  v_K = \sqrt{\frac{GM}{r}} \cdot \frac{1}{\sqrt{1 - \RS/r}} \cdot \frac{1}{c}
+\end{equation}
+
+(in unità dove $c = 1$). All'ISCO ($r = 3\RS$):
+\begin{equation}
+  v_K(\Risco) = \sqrt{\frac{M}{6M}} \cdot \frac{1}{\sqrt{1-1/3}} = \frac{1}{\sqrt{6}} \cdot \frac{\sqrt{3}}{\sqrt{2}} = \frac{1}{2}c
+\end{equation}
+cioè metà della velocità della luce — profondamente relativistico.
+
+Il fattore Doppler per un osservatore che vede il materiale muoversi con
+velocità $\beta = v/c$ a un angolo $\psi$ rispetto alla linea di vista è:
+
+\begin{physbox}{Fattore Doppler Relativistico}
+\begin{equation}
+  \mathcal{D} = \frac{1}{\gamma\,(1 - \beta\cos\psi)},
+  \qquad \gamma = \frac{1}{\sqrt{1-\beta^2}}
+  \label{eq:doppler}
+\end{equation}
+\end{physbox}
+
+Il flusso osservato (potenza per unità di area e frequenza) scala come:
+\begin{equation}
+  F_{\text{obs}} = \mathcal{D}^3 \cdot F_{\text{em}}
+\end{equation}
+Il cubo compare perché:
+\begin{enumerate}
+  \item un fattore $\mathcal{D}$ proviene dalla variazione dell'energia dei fotoni
+        ($E_{\text{obs}} = \mathcal{D} E_{\text{em}}$),
+  \item un fattore $\mathcal{D}$ proviene dall'aberrazione (la sezione trasversale
+        apparente del fascio varia),
+  \item un fattore $\mathcal{D}$ proviene dalla frequenza di arrivo dei fotoni
+        (rate = $\mathcal{D}$ volte il rate di emissione).
+\end{enumerate}
+
+\subsection{L'asimmetria luminosa del disco}
+
+La combinazione di redshift gravitazionale e Doppler produce un'asimmetria
+caratteristica nell'immagine del disco:
+\begin{itemize}
+  \item Il lato in avvicinamento ($\cos\psi > 0$, $\mathcal{D} > 1$): più
+        brillante, più blu, spostato verso l'esterno per il lensing.
+  \item Il lato in allontanamento ($\cos\psi < 0$, $\mathcal{D} < 1$): più
+        scuro, più rosso, compresso verso l'interno.
+\end{itemize}
+
+Questa asimmetria è chiaramente visibile nella fotografia di M87* del 2019:
+il lato sinistro (inferiore in realtà, per la geometria di quella galassia)
+appare circa 3 volte più luminoso. Il fattore $\mathcal{D}^3$ può variare
+da $\sim 0.1$ a $\sim 3$-$4$ lungo il disco.
+
+\subsection{Il photon ring}
+
+I fotoni con parametro d'impatto $b \approx \bc$ compiono quasi un'orbita
+completa attorno alla fotosfera prima di sfuggire. Questi fotoni formano un
+\textbf{photon ring}: un anello brillante e sottilissimo all'interno del quale
+si trova l'ombra del buco nero. In realtà il photon ring è composto da
+infinite sub-strutture:
+\begin{itemize}
+  \item Anello di ordine 0: luce che arriva direttamente dal disco senza
+        orbite aggiuntive (la parte principale del disco).
+  \item Anello di ordine 1: luce che ha orbitato mezza volta attorno al BH.
+  \item Anello di ordine $n$: luce che ha orbitato $n/2$ volte.
+\end{itemize}
+La luminosità decresce geometricamente: ogni anello successivo è circa
+$e^{-\pi}$ più debole del precedente. Gli anelli di ordine $\geq 2$ sono
+praticamente inosservabili con le tecnologie attuali.
+
+\begin{curiosity}{La vera risoluzione di EHT}
+  L'Event Horizon Telescope (EHT) è un interferometro radio con baseline pari
+  al diametro terrestre ($\sim 10^4$ km). Operando a $\lambda = 1.3$ mm,
+  raggiunge una risoluzione angolare di $\theta \sim \lambda/D \approx
+  20\ \mu$as (microarcosecondi). Per confronto, l'occhio umano risolve
+  circa $10^8$ volte peggio ($\sim 1'$ d'arco). La fotografia di M87* del
+  2019 mostra una struttura di circa 40 $\mu$as di diametro — equivalente
+  a vedere una pallina da golf a distanza della Luna.
+\end{curiosity}
+
+\newpage
+
+% ═════════════════════════════════════════════════════════════════════════════
+\section{Il Redshift Gravitazionale e la Radiazione di Hawking}
+% ═════════════════════════════════════════════════════════════════════════════
+
+\subsection{La temperatura di Hawking}
+
+Nel 1974 Stephen Hawking dimostrò, combinando Relatività Generale e meccanica
+quantistica dei campi, che i buchi neri non sono completamente neri: emettono
+radiazione termica con \textbf{temperatura di Hawking}:
+
+\begin{physbox}{Temperatura di Hawking}
+\begin{equation}
+  T_H = \frac{\hbar c^3}{8\pi G M k_B}
+      \approx \frac{6.2 \times 10^{-8}\ \text{K}}{M/M_\odot}
+\end{equation}
+\end{physbox}
+
+Per un buco nero di massa solare, $T_H \approx 62$ nK — completamente
+irrilevabile rispetto alla temperatura del fondo cosmico a microonde
+($T_{\text{CMB}} \approx 2.7$ K). I buchi neri stellari sono di fatto
+eterni su scale cosmologiche.
+
+Al contrario, un ipotetico micro buco nero di massa $10^{12}$ kg
+(un meteorite di 1 km) avrebbe $T_H \sim 10^{12}$ K e evapora
+nell'ordine del tempo dell'universo.
+
+\subsection{Il paradosso dell'informazione}
+
+Se un buco nero evapora completamente per radiazione di Hawking, le
+informazioni del materiale caduto dentro — in linea di principio
+registrate nello stato quantistico di ogni particella — dove vanno?
+La meccanica quantistica richiede l'unitarietà dell'evoluzione temporale:
+l'informazione non può essere distrutta. La Relatività Generale sembra
+invece suggerire che l'informazione sia perduta irrecuperabilmente.
+
+Questo \textbf{paradosso dell'informazione} (Hawking, 1976) è uno dei
+problemi aperti più profondi della fisica teorica. Recenti progressi
+suggeriscono che l'informazione emerga nell'ultima fase dell'evaporazione
+attraverso correlazioni quantistiche nella radiazione di Hawking (isole
+di entanglement, pagine di entanglement). La risoluzione completa richiede
+probabilmente una teoria della gravità quantistica.
+
+\newpage
+
+% ═════════════════════════════════════════════════════════════════════════════
+%  PARTE II — IMPLEMENTAZIONE
+% ═════════════════════════════════════════════════════════════════════════════
+
+\section{Il Ray Tracing Relativistico}
+
+\subsection{Filosofia dell'algoritmo}
+
+Renderizzare un buco nero richiede di tracciare il percorso dei fotoni in uno
+spaziotempo curvo. A differenza del ray tracing classico (dove la luce viaggia
+in linea retta), qui i raggi si curvano seguendo le geodetiche della metrica
+di Schwarzschild.
+
+La strategia è il \textbf{ray tracing all'indietro nel tempo} (\emph{backward
+ray tracing}): per ogni pixel dell'immagine, si lancia un raggio dal punto
+di vista dell'osservatore e si integra la geodetica \emph{all'indietro} verso
+la sorgente. Questo è fisicamente legittimo per la time-reversal symmetry
+delle equazioni di Maxwell nel vuoto.
+
+\subsection{Il metodo di Runge-Kutta al quarto ordine}
+
+L'equazione di Binet \eqref{eq:binet} è un'equazione differenziale ordinaria
+del secondo ordine. Riscritta come sistema del primo ordine
+$(u, w) = (1/r, du/d\varphi)$:
+
+\begin{equation}
+  \frac{d}{d\varphi}\begin{pmatrix}u \\ w\end{pmatrix}
+  = \mathbf{F}(u, w)
+  = \begin{pmatrix} w \\ -u + \tfrac{3\RS}{2}\,u^2 \end{pmatrix}
+\end{equation}
+
+Il metodo \textbf{Runge-Kutta al quarto ordine} (RK4) approssima la soluzione
+con errore locale $O(h^5)$ e globale $O(h^4)$:
+
+\begin{physbox}{Schema Runge-Kutta 4 (RK4)}
+\begin{align}
+  \mathbf{k}_1 &= \mathbf{F}(\mathbf{y}_n) \notag\\
+  \mathbf{k}_2 &= \mathbf{F}\!\left(\mathbf{y}_n + \tfrac{h}{2}\mathbf{k}_1\right) \notag\\
+  \mathbf{k}_3 &= \mathbf{F}\!\left(\mathbf{y}_n + \tfrac{h}{2}\mathbf{k}_2\right) \notag\\
+  \mathbf{k}_4 &= \mathbf{F}\!\left(\mathbf{y}_n + h\,\mathbf{k}_3\right) \notag\\
+  \mathbf{y}_{n+1} &= \mathbf{y}_n
+    + \frac{h}{6}\left(\mathbf{k}_1 + 2\mathbf{k}_2 + 2\mathbf{k}_3 + \mathbf{k}_4\right)
+  \label{eq:rk4}
+\end{align}
+\end{physbox}
+
+RK4 valuta la funzione $\mathbf{F}$ quattro volte per passo: ai bordi ($k_1$,
+$k_4$) e nel mezzo ($k_2$, $k_3$). La media pesata $1{:}2{:}2{:}1$ garantisce
+la simmetria del metodo e la convergenza al quarto ordine.
+
+\subsection{Condizioni di terminazione}
+
+Durante l'integrazione, il raggio può:
+
+\begin{enumerate}
+  \item \textbf{Cadere nell'orizzonte} ($r \leq \RS$): il pixel è nero.
+  \item \textbf{Intersecare il disco} (piano $y=0$, $\Risco \leq r \leq r_{\text{out}}$):
+        si calcola il colore del disco con il profilo di Novikov-Thorne.
+  \item \textbf{Sfuggire all'infinito} ($r > r_{\max}$): si recupera il
+        campo stellare di sfondo, deflesso dal lensing.
+\end{enumerate}
+
+\subsection{Il colore finale del pixel}
+
+La catena completa per ogni pixel è:
+
+\begin{equation}
+  \text{pixel} \xrightarrow{\text{ray cast}}
+  (r_0, \mathbf{d}) \xrightarrow{\text{RK4, 512 passi}}
+  \text{esito} \xrightarrow{\text{colore}}
+  \begin{cases}
+    \mathbf{0} & \text{orizzonte}\\
+    \text{HSV}(T_{\text{obs}}, \mathcal{D}) & \text{disco}\\
+    \text{stelle}(\mathbf{d}_{\text{deflessa}}) & \text{fuga}
+  \end{cases}
+\end{equation}
+
+\subsection{Il tone mapping e la correzione gamma}
+
+I calcoli fisici producono valori di radianza in spazio lineare e potenzialmente
+illimitati. Due passaggi di post-processing adattano l'output al display:
+
+\subsubsection{Tone mapping di Reinhard}
+
+Comprime l'intervallo $[0, +\infty) \to [0, 1)$ preservando i dettagli nelle
+alte luci:
+\begin{equation}
+  L_{\text{display}} = \frac{L_{\text{lineare}}}{L_{\text{lineare}} + 1}
+\end{equation}
+
+\subsubsection{Correzione gamma}
+
+I monitor CRT (e i display moderni che ne ereditano la convenzione) hanno
+una risposta non lineare. La correzione sRGB usa $\gamma = 2.2$:
+\begin{equation}
+  \text{sRGB} = L_{\text{display}}^{1/2.2}
+\end{equation}
+Senza questa correzione, le immagini calcolate in spazio lineare appaiono
+troppo scure nelle mezze tonalità.
+
+\newpage
+
+% ═════════════════════════════════════════════════════════════════════════════
+\section{Il Codice GLSL Commentato}
+% ═════════════════════════════════════════════════════════════════════════════
+
+\subsection{Struttura generale}
+
+Lo shader è un \textbf{fragment shader} GLSL 3.30 che gira sulla GPU per ogni
+pixel dello schermo in parallelo. Le variabili \texttt{uniform} sono passate
+dalla CPU ogni frame:
+
+\begin{itemize}
+  \item \texttt{iResolution}: dimensioni in pixel dello schermo
+  \item \texttt{iTime}: secondi dall'avvio (per l'animazione)
+  \item \texttt{uInclination}: angolo di inclinazione della camera
+\end{itemize}
+
+\subsection{Funzioni chiave}
+
+\subsubsection{geodesicRHS — La destra del sistema ODE}
+
+Implementa $\mathbf{F}(u,w) = (w,\ -u + 1.5\,\RS\,u^2)$:
+
+\begin{tcolorbox}[codebox, title={geodesicRHS.glsl}]
+\begin{verbatim}
+vec2 geodesicRHS(vec2 y) {
+    float u    = y.x;     // u = 1/r
+    float duPhi = y.y;    // du/dphi
+    return vec2(duPhi, -u + 1.5 * RS * u * u);
+    //          ^^^^^   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    //        dy[0]/dphi   dy[1]/dphi (eq. di Binet)
+}
+\end{verbatim}
+\end{tcolorbox}
+
+\subsubsection{rk4Step — Un passo di Runge-Kutta 4}
+
+\begin{tcolorbox}[codebox, title={rk4Step.glsl}]
+\begin{verbatim}
+vec2 rk4Step(vec2 y, float h) {
+    vec2 k1 = geodesicRHS(y);
+    vec2 k2 = geodesicRHS(y + 0.5*h*k1);
+    vec2 k3 = geodesicRHS(y + 0.5*h*k2);
+    vec2 k4 = geodesicRHS(y + h*k3);
+    return y + (h/6.0) * (k1 + 2.0*k2 + 2.0*k3 + k4);
+}
+\end{verbatim}
+\end{tcolorbox}
+
+\subsubsection{accretionDiskColor — Colore del disco}
+
+Implementa la catena:
+$r \to T_{\text{em}}(r) \to T_{\text{obs}} \times \sqrt{1-\RS/r} \to
+T_{\text{obs}} \times \mathcal{D} \to \text{blackbody} \times \mathcal{D}^3$
+
+\begin{tcolorbox}[codebox, title={accretionDiskColor.glsl}]
+\begin{verbatim}
+// Profilo Novikov-Thorne (approssimato)
+float x        = r / R_ISCO;
+float tProfile = pow(x, -0.75) * pow(max(1.0 - 1.0/sqrt(x), 0.0), 0.25);
+float T_emit   = 8000.0 * tProfile;       // Kelvin (normalizzati)
+
+// Redshift gravitazionale: T_obs = T_emit * sqrt(1 - rs/r)
+float gravRedshift = sqrt(max(1.0 - RS/r, 0.0));
+float T_obs        = T_emit * gravRedshift;
+
+// Velocità kepleriana GR e fattore Doppler
+float beta  = clamp(sqrt(M/r) / sqrt(1.0 - RS/r), 0.0, 0.95);
+float gamma = 1.0 / sqrt(1.0 - beta*beta);
+float D     = 1.0 / (gamma * (1.0 - beta * sin(phi_angle)));
+
+// Temperatura osservata (include Doppler)
+T_obs *= D;
+
+// Flusso: D^3 * redshift^4 * profilo
+float flux = pow(D, 3.0) * pow(gravRedshift, 4.0) * tProfile;
+\end{verbatim}
+\end{tcolorbox}
+
+\subsection{Complessità computazionale}
+
+Per ogni pixel (tipicamente $1920 \times 1080 \approx 2 \times 10^6$ pixel):
+\begin{itemize}
+  \item 512 passi RK4, ciascuno con 4 valutazioni di \texttt{geodesicRHS}
+  \item Total: $512 \times 4 = 2048$ valutazioni per pixel
+  \item Total screen: $\sim 4 \times 10^9$ operazioni floating-point per frame
+\end{itemize}
+
+Una moderna GPU (es. NVIDIA RTX 4090, $\sim 82$ TFLOPS) gestisce questo in
+circa $50$ ms, ottenendo $\sim 20$ fps. Riducendo i passi a 256 si raggiungono
+60 fps con minima perdita di qualità.
+
+\newpage
+
+% ═════════════════════════════════════════════════════════════════════════════
+\section{Formulazione Matematica Completa dello Shader}
+% ═════════════════════════════════════════════════════════════════════════════
+
+Riassumendo tutte le equazioni in una catena causale unica, il colore di un
+pixel $(p_x, p_y)$ al tempo $t$ è:
+
+\subsection*{Passo 1: Setup del raggio}
+
+\begin{equation}
+  \mathbf{d} = \left(\frac{p_x - W/2}{H},\ \frac{p_y - H/2}{H},\ 0.7\right)_{\!\text{norm}}
+\end{equation}
+
+\subsection*{Passo 2: Parametro d'impatto}
+
+\begin{equation}
+  b = r_0 \cdot |\mathbf{d} \times \hat{\mathbf{r}}_0|
+\end{equation}
+
+\subsection*{Passo 3: Integrazione RK4 dell'equazione di Binet}
+
+\begin{equation}
+  (u_{n+1}, w_{n+1}) = \text{RK4}\!\left[(u_n, w_n),\ h = \frac{\Delta\varphi}{r_n}\right]
+  \quad \text{per } n = 0, 1, \dots, 511
+\end{equation}
+
+\subsection*{Passo 4: Colore}
+
+\[
+  \text{pixel} = \begin{cases}
+    \mathbf{0}
+      & r \leq \RS \\[4pt]
+    \text{BB}\!\left[
+      T_{\text{em}}(r) \cdot \sqrt{1-\RS/r} \cdot \mathcal{D}(\beta, \psi)
+    \right] \cdot \mathcal{D}^3 \cdot (1-\RS/r)^2
+      & r_{\text{ISCO}} \leq r \leq r_{\text{out}} \\[4pt]
+    \text{stelle}(\mathbf{d}_{\text{lens}})
+      + \text{photon ring}(|b - \bc|)
+      & \text{altrimenti}
+  \end{cases}
+\]
+
+dove $\text{BB}[T]$ è il colore di un corpo nero alla temperatura $T$,
+approssimato dalla funzione \texttt{blackbodyColor} dello shader.
+
+\subsection*{Passo 5: Post-processing}
+
+\begin{equation}
+  \text{output} = \left(\frac{\text{pixel}}{\text{pixel} + \mathbf{1}}\right)^{1/2.2}
+\end{equation}
+
+\newpage
+
+% ═════════════════════════════════════════════════════════════════════════════
+\section{Approfondimenti e Letture Consigliate}
+% ═════════════════════════════════════════════════════════════════════════════
+
+\subsection{Testi di riferimento}
+
+\begin{description}
+  \item[Misner, Thorne, Wheeler — \textit{Gravitation} (1973)]
+    Il testo fondamentale della Relatività Generale, monumentale e completo.
+    Il capitolo 25 tratta le geodetiche di Schwarzschild.
+
+  \item[Wald — \textit{General Relativity} (1984)]
+    Trattazione matematicamente rigorosa, ideale per chi ha basi di geometria
+    differenziale. Utilizza la notazione con forme differenziali.
+
+  \item[Carroll — \textit{Spacetime and Geometry} (2004)]
+    Testo moderno e accessibile, con eccellente introduzione alla geometria
+    differenziale e ai buchi neri.
+
+  \item[Novikov, Thorne — in DeWitt \& DeWitt (1973)]
+    L'articolo originale sul profilo di temperatura del disco di accrescimento.
+
+  \item[Luminet — \textit{Image of a Spherical Black Hole} (1979)]
+    La prima simulazione visiva di un buco nero, precursore storico degli
+    shader moderni. L'autore calcolò l'immagine su carta millimetrata.
+
+  \item[James et al. — \textit{Gravitational lensing in Interstellar} (2015)]
+    Come il team di Kip Thorne realizzò il buco nero di Interstellar.
+    Descrive il codice DNGR (Double Negative Gravitational Renderer),
+    che risolve le geodetiche in 4D complete.
+\end{description}
+
+\subsection{Estensioni future dello shader}
+
+La simulazione presentata in questo documento può essere estesa in vari modi:
+
+\begin{enumerate}
+  \item \textbf{Metrica di Kerr completa}: integrare le geodetiche 4D nella
+    metrica di Kerr richiede l'uso della quarta costante del moto (costante
+    di Carter $Q$) e un sistema ODE a 4 equazioni.
+
+  \item \textbf{Polarizzazione}: i fotoni del disco sono polarizzati per
+    scattering dei elettroni (polarizzazione di Thomson). Il piano di polarizzazione
+    ruota lungo la geodetica (rotazione di Faraday, effetto gravitazionale di
+    Skrotskij).
+
+  \item \textbf{Ombra multipla}: includere i photon ring di ordine superiore
+    (immagini fantasma del disco viste dopo 1, 2, 3 orbite attorno alla fotosfera).
+
+  \item \textbf{Plasma nel disco}: la struttura turbolenta del disco può essere
+    simulata con MHD (magnetoidrodinamica) procedurale, usando noise di Perlin
+    o simplex tridimensionale invece della semplice modulazione sinusoidale.
+
+  \item \textbf{Jet relativistico}: i buchi neri rotanti spesso emettono jet
+    di plasma lungo l'asse di rotazione a velocità $\sim 0.99c$. La simulazione
+    visiva dei jet richiede l'equazione di trasferimento radiativo per un plasma
+    relativisticamente beamizzato.
+\end{enumerate}
+
+% ═════════════════════════════════════════════════════════════════════════════
+%  APPENDICE
+% ═════════════════════════════════════════════════════════════════════════════
+\appendix
+
+\section{Tabella dei Simboli}
+
+\begin{table}[h!]
+  \centering
+  \renewcommand{\arraystretch}{1.4}
+  \begin{tabular}{cll}
+    \toprule
+    \textbf{Simbolo} & \textbf{Nome} & \textbf{Unità (SI)} \\
+    \midrule
+    $\gmunu$          & Tensore metrico & adimensionale \\
+    $\Gmunu$          & Tensore di Einstein & m$^{-2}$ \\
+    $\Rmunu$          & Tensore di Ricci & m$^{-2}$ \\
+    $\Tmunu$          & Tensore energia-impulso & Pa = J/m$^3$ \\
+    $\RS$             & Raggio di Schwarzschild & m \\
+    $\Rph$            & Raggio fotosfera & m \\
+    $\Risco$          & Raggio ISCO & m \\
+    $\bc$             & Parametro d'impatto critico & m \\
+    $u = 1/r$         & Inverso del raggio (Binet) & m$^{-1}$ \\
+    $\varphi$         & Angolo azimutale & rad \\
+    $b = L/E$         & Parametro d'impatto & m \\
+    $\mathcal{D}$     & Fattore Doppler relativistico & adimensionale \\
+    $\beta = v/c$     & Velocità ridotta & adimensionale \\
+    $\gamma$          & Fattore di Lorentz & adimensionale \\
+    $T_H$             & Temperatura di Hawking & K \\
+    $\dot{M}$         & Tasso di accrescimento & kg/s \\
+    $\eta$            & Efficienza di accrescimento & adimensionale \\
+    \bottomrule
+  \end{tabular}
+  \caption{Principali simboli usati nel documento.}
+\end{table}
+
+\section{Unità Geometrizzate}
+
+In questo documento usiamo unità geometrizzate in cui:
+\begin{equation}
+  G = c = 1
+\end{equation}
+In queste unità ogni grandezza fisica si esprime in potenze di massa $M$:
+\begin{align}
+  \text{lunghezza} &= GM/c^2 \approx 1477\ \text{m}\ (M/M_\odot) \\
+  \text{tempo}     &= GM/c^3 \approx 4.93\ \mu\text{s}\ (M/M_\odot) \\
+  \text{velocità}  &= c = 1
+\end{align}
+
+Per convertire in SI: moltiplicare per $GM/c^2$ per le lunghezze e $GM/c^3$
+per i tempi.
+
+\end{document}
